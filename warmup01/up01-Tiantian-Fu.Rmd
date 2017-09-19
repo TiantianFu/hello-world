@@ -1,0 +1,19 @@
+---
+title: "WARMUP1"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Cooking Recipe
+## Ingredients
+* sugars
+* butter
+* vanilla
+* egg
+* baking soda
+* salt 
+
+##kitchen tools
+
