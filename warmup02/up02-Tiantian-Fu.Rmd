@@ -1,0 +1,47 @@
+---
+title: "Warmup2"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# assembling url (so it fits on the screen)
+github <- 'https://github.com/ucb-stat133/stat133-hws-fall17/'
+repo <- 'raw/master/warmup02/data/nba2017-salary-points.RData'
+download.file(
+  url = paste0(github, repo),
+  destfile = "nba2017-salary-points.RData")
+
+# load the objects
+load("nba2017-salary-points.RData")
+
+# list the available objects
+ls()
+```
+#Quantitative Variable
+```{r}
+summary(points)
+sd(points,na.rm = FALSE)
+hist(points)
+boxplot(points)
+```
+#Qualitative Variable
+```{r}
+factor(position)
+table(position)
+table(position)/441
+barplot(table(position))
+
+```
+
+* I think that the process to analyse data and make a report is the hardest thing, even though we are pretty much sure how we should write a proper report.
+* I think that find some certain functions by using help is the easy part even though, we did not cover a lot during the class.
+* The error I was struggling with is how to find and use the density function.
+* I do not really understand how to describe data 
+* The most time consuming part is write a summary
+* I did not collaborate with other students
+* It was all right.
+
