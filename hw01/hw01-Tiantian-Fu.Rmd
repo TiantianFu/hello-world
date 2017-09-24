@@ -1,0 +1,175 @@
+---
+title: "hw01-Tiantian-Fu.Rmd"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+importing the data
+```{r}
+#load data file
+load("data/nba2017-salary-points.RData")
+#list the available objects
+ls()
+```
+1) bit of data preprocessing
+```{r}
+#New salary variable mearsured in millions of dollars.
+salary_millions <- salary/1000000
+summary(salary_millions)
+
+#replace the values "R" by "0"
+experience[experience=="R"]=0
+list(experience)
+
+#create a new integer vector
+experience_new <-experience
+
+#create a new position variable as R factor.
+factor(position)
+position_new = factor(position,labels=c("center","power_fwd","point_guard","small_fwd","shoot_guard"))
+
+#compute frequencies
+table(position_new)
+```
+2)Scatterplot of points and salary
+```{r}
+plot(points,salary_millions,main="Scatterplot of Points and Salary",xlab = "points",ylab="salary_millions")
+```
+
+3)Correlation betweeen Points and Salary
+```{r}
+n1=length(points)
+
+#mean of points
+meanofpoints=sum(points)/n1
+n2=length(salary)
+
+#mean of salary
+meanofsalary=sum(salary)/n2
+
+#variance of points
+varpoints=sum((points-meanofpoints)*(points-meanofpoints))/(n1-1)
+
+#standard deviation of points
+sdofpoints=sqrt(varpoints)
+
+#variance of salary
+varsalary=sum((salary-meanofsalary)*(salary-meanofsalary))/(n1-1)
+
+#standard deviation of salary
+sdofsalary=sqrt(varsalary)
+
+#covariance between points and salary
+covar=sum((points-meanofpoints)*(salary-meanofsalary))/(n1-1)
+
+#corelation betwwen points and salary
+corofAB=covar/(sdofpoints*sdofsalary)
+
+
+```
+
+4)Simple Linear Regression
+```{r}
+#slop b1
+b1=corofAB*sdofsalary/sdofpoints
+
+#the intercept b0
+b0=meanofsalary-(b1*meanofpoints)
+
+#the linear regression equation 
+Y=b0+b1*points
+
+#when points = 0,Y=1509886
+Y1=b0+b1*0
+#when points = 100,Y=2365554
+Y2=b0+b1*100
+#when points = 500,Y=5788226
+Y3=b0+b1*500
+#when points =1000,Y=10066566
+Y4=b0+b1*1000
+#when points =2000,Y=18623247
+Y5=b0+b1*2000
+
+
+summary(Y)
+#b1:b1 is the increasing coefficent, which means adding one more point will have b1 amount of more salary.
+#b0:b0 is the minimun amount of salary of all points given.
+
+```
+Y=`r b0`+`r b1`x
+
+5)Plotting the regression line
+```{r}
+reg<- lm(salary_millions~points)
+plot(points,salary_millions,main="Regression and Lowess lines",
+     xlab="points",
+     ylab="salary",
+     )
+abline(reg,col="blue",lwd=3)
+lines(lowess(points,salary_millions),col="orange",lwd=3)
+
+text(c(2500,2000),c(20,25),labels=c("regression","lowess"))
+
+
+```
+6)Regression residuals and Coefficient of Determination R^2
+```{r}
+#the vector of residuals
+Ei=salary_millions-Y
+summary(Ei)
+
+#the Residual Sum of Squares
+RS=sum(Ei*Ei)
+
+#Total Sum of Square
+mean(salary_millions)
+TS=sum((Y-mean(salary_millions))*(Y-mean(salary_millions)))
+
+#the coefficient of determination R^2
+R2= 1-(RS/TS)
+```
+7)Exploring Position and Experience
+```{r}
+#scatterplot 
+plot(experience_new,salary_millions,main = "Scatterplot with lowess smooth",
+     xlab = "Years of Experience",
+     ylab = "Salary(in millions)"
+)
+lines(lowess(experience_new,salary_millions),col="red",lwd=3)
+   
+#Use the function scatterplot3d
+
+library(scatterplot3d)
+scatterplot3d(points,experience_new,salary_millions,
+              xlab="points",
+              ylab="Years of Experience",
+              angle=55,
+              color="plum3",
+              main="3D-Scatterplot"
+              )
+
+#A conditional boxplot of Salary interms of Position
+boxplot(salary_millions ~ position_new,
+        xlab = "Position",
+        ylab = "Salary(in millions)")
+
+```
+- Description of the plots
+The mean salary of each position are about the same, however, the maximum salary of each position are reletively different. position of center have the highest salary while point guard has the least.
+- Experience seems not be related with Salary.
+- Position seems not be realted with Salary.
+8)Comments and Reflections
+
+1. I think finding the correct and using the correct function is the hardest part of this assignment.
+2. I think using plot is the easiest as long as you find the pattern of doing that.
+3. I think using git is still confused me 
+4. I think it is still hard for me to manipulate GitHub.
+5. I asked my friends and GSI to help me finish my HW
+6. I spent about 7 hours to complete this assignment.
+7. The most time comsuming part is creating different kinds of graphs.
+8. I am still confused about using functions to change elements of vectors.
+9. using different kinds of functions.
+10. I like creating graphs and analyze data.
+
