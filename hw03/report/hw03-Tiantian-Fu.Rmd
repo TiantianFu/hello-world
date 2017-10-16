@@ -1,0 +1,95 @@
+---
+title: "hw03-Tiantian-Fu.Rmd"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Ranking of Teams
+```{r}
+
+library(readr)
+library(ggplot2)
+library(dplyr)
+teams <-read.csv('../data/nba2017-teams.csv')
+
+#NBA teams ranked by total salary
+
+  ggplot(data=teams,aes(x=reorder(team,sum_salary),y=sum_salary))+
+  geom_bar(stat="identity",fill="grey")+
+  coord_flip()+
+  labs(x="Team",y="Salary(in millions)")+
+  geom_hline(aes(yintercept = mean(sum_salary)),col="red")+
+  ggtitle("NBA Teams ranked by Total Salary")
+```
+
+```{r}
+#NBA Teams ranked by Total Points
+teams2 <-arrange(teams,desc(sum_points))
+ggplot(data=teams2,aes(x=reorder(team,sum_points),y=sum_points))+
+  geom_bar(stat="identity",fill="grey")+
+  coord_flip()+
+  labs(x="Team",y="Total Points")+
+  geom_hline(aes(yintercept = mean(sum_points)),col="red")+
+  ggtitle("NBA Teams ranked by Total Points")
+```
+
+```{r}
+#NBA Teams ranked by Total Efficiency
+teams3 <-arrange(teams,desc(sum_eff))
+ggplot(data=teams3,aes(x=reorder(team,sum_eff),y=sum_eff))+
+  geom_bar(stat="identity",fill="grey")+
+  coord_flip()+
+  labs(x="Team",y="Total Efficiency")+
+  geom_hline(aes(yintercept = mean(sum_eff)),col="red")+
+  ggtitle("NBA Teams ranked by Total Efficiency")
+```
+Principal Components Analysis (PCA)
+```{r}
+#Calculate PCA of the teams
+teams_pca <-prcomp(select(teams,sum_points3,sum_points2,sum_ft,sum_off,sum_def,sum_assist,sum_steals,sum_blocks,sum_turn,sum_fouls),scale.= TRUE)
+teams_pca
+
+#Create a data frame with the eigenvalues
+eigs <- data.frame (
+  "eigenvalues" = round(teams_pca$sdev,4),
+  "prop"= round(teams_pca$sdev^2/sum(teams_pca$sdev^2),4),
+  "cumprop" = round(cumsum(teams_pca$sdev^2/sum(teams_pca$sdev^2)),4),
+  row.names = 1:10
+)
+eigs
+
+#Use the first two PCs to get a scatterplot of the teams
+
+pc_1 <- teams_pca$x[ ,1]
+pc_2 <- teams_pca$x[ ,2]
+df<- data.frame(
+  pc1=pc_1,
+  pc2=pc_2
+  )
+df
+
+
+ggplot(data=df,aes(x=pc1,y=pc2))+
+  geom_point()+
+  geom_text(aes(label=teams$team))+
+  geom_hline(yintercept=0)+
+  geom_vline(xintercept=0)
+  
+#Index based on PC1
+z1 <- df$pc1
+s1=(z1-min(z1))/(max(z1)-min(z1))
+
+#NBA Teams ranked by scaled PC1
+teams_new<-mutate(teams,s1)
+ ggplot(data=teams_new,aes(x=reorder(team,s1),y=s1))+
+  geom_bar(stat="identity",fill="grey")+
+  coord_flip()+
+  labs(x="Team",y="First PC(scaled from 0 to 100)")+
+  ggtitle("NBA Teams ranked by scaled PC1")
+ 
+ #Brief description of teh PC1 to ranke the team
+ #we can tell from the graph that GSW is the first team raking by PC1
+```
+
